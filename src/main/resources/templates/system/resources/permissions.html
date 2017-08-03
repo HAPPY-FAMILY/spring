@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="/common/header :: header" />
+<body>
+<script th:inline="javascript">
+	var setting = {
+		check: {
+			enable: true
+		},
+		data : {
+			simpleData : {
+				enable : true,
+				idKey: 'id',
+				pIdKey: 'parentId'
+			}
+		}
+	};
+	var zNodes = JSON.parse([[${permissions}]]);
+	console.info(zNodes);
+	var zTree;
+	$(document).ready(function() {
+		zTree = $.fn.zTree.init($('#pztree'), setting, zNodes);
+		//zTree.expandAll(true);
+		zTree.setting.check.chkboxType = { 'Y' : 'ps', 'N' : 's' };
+		 $.ajax({
+				type : 'GET',
+				data : {
+					//'userId' : '${param.userId}',
+					'roleId' : [[${roleId}]],
+				},
+				url : '/system/resources/findRes',
+				dataType : 'json',
+				success : function(json) {
+					for (index in json) {
+						if(json[index].id!=undefined){
+							zTree.checkNode( zTree.getNodeByParam( 'id',json[index].id ), true ); 
+						}
+					    if(json[index].status == 0){
+					    	zTree.hideNode(zTree.getNodeByParam( 'id',json[index].id ));
+					    }
+					};
+					
+				}
+			}); 
+	});
+    function submit() {
+		 var sNodes = zTree.getCheckedNodes(true);
+			var resIds = '';
+			if(sNodes != undefined && sNodes != 0){
+				for(var i=0;i<sNodes.length;i++){
+					resIds += sNodes[i].id+',';
+				};
+			}
+			
+			$.ajax({
+				async : false, //请勿改成异步，下面有些程序依赖此请数据
+				type : 'POST',
+				data : {
+					//'userId' : '${param.userId}',
+					'roleId' : [[${roleId}]],
+					'resIds':resIds
+				},
+				url : '/system/resources/addResRole',
+				dataType : 'json',
+				success : function(json) {
+					if (json.status == 200) {
+						layer.msg('分配成功！');
+						layer.close(pageii);
+					} else {
+						layer.alert('分配失败！', {
+							icon : 2
+						});
+						console.log(json.msg);
+					}
+					;
+				}
+			});
+		};
+</script>
+<ul id="pztree" class="ztree"></ul>
+</html>

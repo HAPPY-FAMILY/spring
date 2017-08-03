@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<script th:src="@{https://cdn.bootcss.com/jquery/2.2.4/jquery.min.js}"></script>
+<head th:include="/common/header :: header" />
+<body class="gray-bg">
+
+
+    <div class="middle-box text-center animated fadeInDown">
+        <h1>500</h1>
+        <h3 class="font-bold">服务器内部错误</h3>
+
+        <div class="error-desc">
+            服务器好像出错了...
+            <br/>
+            <br/>
+            <a onclick="$('.hide.ex').removeClass('hide');" class="btn btn-primary m-t">查看错误信息</a>
+            <br/>
+            <div class="hide ex" th:text="${ex}"></div>
+        </div>
+    </div>
+</body>
+
+</html>

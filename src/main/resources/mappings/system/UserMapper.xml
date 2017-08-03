@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.transam.system.mapper.UserMapper">
+    
+    <sql id="Base_Column_List">
+    	id id,
+    	account_name accountName,
+    	email email,
+    	head_pic headPic,
+    	mobile mobile,
+    	password password,
+    	credentials_salt credentialsSalt,
+    	locked locked,
+    	remark remark,
+    	create_date createDate,
+    	update_date updateDate
+    </sql>
+    
+    <sql id="Data_Of_Where">
+    	<where>
+	    	<if test="id != null">
+	    		and id = #{id}
+	    	</if>
+	    	<if test="accountName != null and accountName != '' ">
+	    		and account_name LIKE CONCAT('%',#{accountName},'%')
+	    	</if>
+	    	<if test="email != null and email != '' ">
+	    		and email LIKE CONCAT('%',#{email},'%')
+	    	</if>
+	    	<if test="mobile != null and mobile !=''">
+	    		and mobile LIKE CONCAT('%',#{mobile},'%')
+	    	</if>
+	    	<if test="roleName != null and roleName !=''">
+	    		and (SELECT GROUP_CONCAT(name) FROM sys_role WHERE sys_role.id in (SELECT role_id FROM sys_user_role WHERE user_id = sys_user.id)) LIKE CONCAT('%',#{roleName},'%')
+	    	</if>
+	    		and del_flag != 1  	
+    	</where>
+    </sql>
+    
+    <!-- 登录方法 -->
+    <select id="findByAccountName" parameterType="java.lang.String" resultType="com.transam.system.entity.User">
+    	SELECT 
+			<include refid="Base_Column_List"/>
+		FROM sys_user
+		WHERE del_flag != 1 AND account_name = #{key}
+    </select>
+    
+    <select id="findByUser" parameterType="com.transam.system.entity.User" resultType="com.transam.system.entity.User">
+    	SELECT
+    		<include refid="Base_Column_List"/>
+    	FROM sys_user
+    	<where>
+    		<if test="accountName != null and accountName != ''">
+    			and account_name = #{accountName}
+    		</if>
+    		<if test="email != null and email != ''">
+    			and email = #{email}
+    		</if>
+    		<if test="mobile != null and mobile !=''">
+	    		and mobile = #{mobile}
+	    	</if>
+    		<if test="delFlag != null">
+    			and del_flag = #{delFlag,jdbcType=INTEGER}
+    		</if>
+    	</where>
+    </select>
+    
+    <select id="getByPrimaryKey" parameterType="java.lang.Long" resultType="com.transam.system.entity.User">
+    	SELECT 
+    		<include refid="Base_Column_List" />
+    	FROM sys_user
+    	WHERE id = #{id}
+    </select>
+    
+	<select id="findAllList" parameterType="com.transam.system.entity.User" resultType="com.transam.system.entity.User">
+		SELECT
+			id id,
+	    	account_name accountName,
+	    	email email,
+	    	mobile mobile,
+	    	locked locked,
+	    	create_date createDate,
+	    	update_date updateDate
+		FROM sys_user
+			<include refid="Data_Of_Where"/>
+	</select>
+	
+	<select id="findList" parameterType="com.transam.system.entity.User" resultType="com.transam.system.entity.User">
+		SELECT
+			id id,
+	    	account_name accountName,
+	    	email email,
+	    	mobile mobile,
+	    	head_pic headPic,
+	    	(SELECT GROUP_CONCAT(name) FROM sys_role
+	    	WHERE sys_role.id in (SELECT role_id FROM sys_user_role WHERE
+	    	user_id = sys_user.id)) roleName,
+	    	password password,
+	    	credentials_salt credentialsSalt,
+	    	locked locked,
+			remark remark,
+	    	create_date createDate,
+	    	update_date updateDate
+		FROM sys_user
+		<include refid="Data_Of_Where"/>
+	</select>
+	
+	<select id="getByRoleId" resultType="com.transam.system.entity.User">
+		SELECT 
+			id, 
+			account_name accountName, 
+			email email,
+			mobile mobile,
+			locked, 
+			create_date createDate 
+		FROM sys_user 
+		WHERE sys_user.id in (SELECT user_id FROM sys_user_role WHERE role_id = #{roleId}) 
+	</select>
+	
+	<select id="getUserbyMap" resultType="com.transam.system.entity.User">
+		SELECT
+			id,
+			account_name accountName,
+			email email,
+			mobile mobile,
+			locked,
+			create_date createDate
+		FROM sys_user 
+		<where>
+			del_flag = 0
+			<if test="where != null and where != ''">
+				and id not in 
+				<foreach item="ids" collection="where" open="(" separator="," close=")">
+					#{ids}
+				</foreach>
+			</if>
+		</where>
+	</select>
+	
+	<delete id="deleteByAccount" parameterType="java.lang.String">
+		DELETE FROM sys_user
+		WHERE account_name = #{accountName}
+	</delete>
+	
+	<delete id="deleteUserRoleByUserId" parameterType="java.lang.Long">
+		DELETE FROM sys_user_role
+		WHERE user_id = #{userId}
+	</delete>
+	
+	<delete id="deleteUserRoleOfBatch">
+		DELETE FROM sys_user_role
+		WHERE user_id in
+		<foreach item="ids" collection="array" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</delete>
+	
+	<delete id="deleteOfBatch">
+		UPDATE sys_user
+		SET del_flag = 1
+		WHERE id in
+		<foreach item="ids" collection="array" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</delete>
+	
+	<insert id="insert">
+		INSERT INTO sys_user(
+	    	id,
+	    	account_name,
+	    	email,
+	    	mobile,
+	    	head_pic,
+	    	password,
+	    	credentials_salt,
+	    	locked,
+	    	del_flag,
+	 		remark,
+	    	create_date,
+	    	update_date
+		) VALUES (
+			#{id}, 
+			#{accountName},
+			#{email},
+			#{mobile},
+			#{headPic},
+			#{password},
+			#{credentialsSalt},
+			#{locked},
+			#{delFlag},
+			#{remark},
+			#{createDate,jdbcType=TIMESTAMP},
+			#{updateDate,jdbcType=TIMESTAMP}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE sys_user
+		<set>
+			<if test="accountName != null and accountName != ''">
+				account_name = #{accountName},
+			</if>
+			<if test="email != null and email != ''">
+				email = #{email},
+			</if>
+			<if test="mobile != null and mobile !=''">
+	    		mobile = #{mobile},
+	    	</if>
+	    	<if test="headPic != null and headPic !=''">
+	    		head_pic = #{headPic},
+	    	</if>
+			<if test="password != null and password != ''">
+				password = #{password},
+			</if>
+			<if test="credentialsSalt != null and credentialsSalt != ''">
+				credentials_salt = #{credentialsSalt},
+			</if>
+			<if test="locked != null and locked != ''">
+				locked = #{locked},
+			</if>
+			<if test="remark != null and remark != ''">
+				remark = #{remark},
+			</if>
+			<if test="updateDate != null">
+				update_date = #{updateDate,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+		
+	<insert id="addUserRoleOfBatch" parameterType="java.util.List">
+        INSERT INTO sys_user_role
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+        user_id,
+        role_id
+        </trim>
+        <foreach collection="list" item="item" open="values (" close=")" separator=" ), ( ">
+            <trim suffixOverrides=",">
+            #{item.userId,jdbcType=BIGINT}, 
+            #{item.roleId,jdbcType=BIGINT}
+
+            </trim>
+        </foreach>
+    </insert>
+	
+</mapper>

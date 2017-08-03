@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.transam.system.mapper.RoleMapper">
+    
+    <sql id="Base_Column_List">
+    	id id,
+    	status status,
+    	name name,
+    	role_key roleKey,
+    	description description,
+    	create_date createDate,
+    	update_date updateDate
+    </sql>
+    
+    <sql id="Data_Of_Where">
+    	<where>
+	    	<if test="id != null">
+	    		and id = #{id}
+	    	</if>
+	    	<if test="name != null and name != ''">
+	    		and name like CONCAT('%',#{name},'%')
+	    	</if>
+    	</where>
+    </sql>
+    
+    <select id="getByPrimaryKey" parameterType="java.lang.Long" resultType="com.transam.system.entity.Role">
+    	SELECT 
+        <include refid="Base_Column_List" />
+        FROM sys_role
+        WHERE id = #{id,jdbcType=BIGINT}
+    </select>
+   
+    <select id="findRoleByUserId" parameterType="java.lang.Long" resultType="com.transam.system.entity.Role">
+    	SELECT 
+    		<include refid="Base_Column_List"/>
+		FROM sys_role
+		WHERE id IN (SELECT role_id FROM sys_user_role WHERE user_id = #{key} ) and status = 1
+    </select>
+    
+    <select id="findUserIdByRoleId" parameterType="java.lang.Long" resultType="java.lang.Long">
+    	SELECT user_id FROM sys_user_role WHERE role_id = #{key}
+    </select>
+    
+	<select id="findAllList" resultType="com.transam.system.entity.Role">
+		SELECT 
+			<include refid="Base_Column_List"/>
+		FROM sys_role
+			<include refid="Data_Of_Where"/>
+	</select>
+	
+	<select id="findByRole" parameterType="com.transam.system.entity.Role" resultType="com.transam.system.entity.Role">
+		SELECT 
+			<include refid="Base_Column_List" />
+		FROM sys_role
+		<where>
+			<if test="name != null and name != ''">
+	    		and name = #{name}
+	    	</if>
+	    	<if test="roleKey != null and roleKey != ''">
+	    		and role_key = #{roleKey}
+	    	</if>
+		</where>
+	</select>
+	
+	<select id="findList" parameterType="com.transam.system.entity.Role" resultType="com.transam.system.entity.Role">
+		SELECT
+			<include refid="Base_Column_List"/>
+		FROM sys_role
+			<include refid="Data_Of_Where"/>
+	</select>
+	
+	<select id="findRoleByMap" resultType="com.transam.system.entity.Role">
+		SELECT
+			<include refid="Base_Column_List"/>
+		From sys_role
+		<where>
+			<if test="where != null and where != ''">
+				id not in
+				<foreach item="ids" collection="where" open="(" separator="," close=")">
+					#{ids}
+				</foreach>
+
+			</if>
+		</where>
+	</select>
+	
+	<select id="getOne" resultType="com.transam.system.entity.Role">
+		SELECT 
+			* 
+		FROM sys_role
+		WHERE id = #{id}
+	</select>
+	
+	<update id="delete">
+		DELETE cms_conten
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="deleteOfBatch" parameterType="java.lang.String">
+		DELETE FROM sys_role
+		WHERE id in
+		<foreach item="ids" collection="array" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</delete>
+	
+	<insert id="insert">
+		INSERT INTO sys_role(
+	    	id ,
+	    	status,
+	    	name,
+	    	role_key,
+	    	description,
+	    	create_date,
+	    	update_date
+		) VALUES (
+			#{id}, 
+			#{status},
+			#{name},
+			#{roleKey},
+			#{description},
+			#{createDate},
+			#{updateDate}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE sys_role
+		<set>
+			<if test="status != null and status != ''">
+				status = #{status},
+			</if>
+			<if test="name != null and name != ''">
+				name = #{name},
+			</if>
+			<if test="roleKey != null and roleKey != ''">
+				role_key = #{roleKey},
+			</if>
+			<if test="description != null and description != ''">
+				description = #{description},
+			</if>
+			<if test="updateDate != null">
+				update_date = #{updateDate},
+			</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.transam.system.mapper.UserRoleMapper">
+    <resultMap id="BaseresultType" type="com.transam.system.entity.UserRole">
+        <id column="user_id" jdbcType="BIGINT" property="userId" />
+
+    </resultMap>
+    
+    <sql id="Base_Column_List">
+        user_id userId,
+		role_id roleId
+
+    </sql>
+    
+    <sql id="Data_Of_Where">
+		<where>
+        <if test="userId != null" >
+            and user_id = #{userId,jdbcType=BIGINT}
+        </if>
+        <if test="roleId != null" >
+            and role_id = #{roleId,jdbcType=BIGINT}
+        </if>
+
+	    </where>
+    </sql>
+    
+    <!--根据id查询-->
+    <select id="getByPrimaryKey" parameterType="java.lang.Long" resultType="com.transam.system.entity.UserRole">
+        SELECT 
+        <include refid="Base_Column_List" />
+        FROM sys_user_role
+        WHERE user_id = #{userId,jdbcType=BIGINT}
+    </select>
+    
+   	 <!-- 根据userId查询 -->
+    <select id="getByUserId" parameterType="java.lang.Long" resultType="com.transam.system.entity.UserRole">
+    	SELECT
+    	<include refid="Base_Column_List"/>
+    	FROM sys_user_role
+    	WHERE user_id = #{userId,jdbcType=BIGINT}
+    </select>
+  
+  	<!--根据查询条件查询，返回entity-->
+    <select id="get" parameterType="com.transam.system.entity.UserRole" resultType="com.transam.system.entity.UserRole">
+        SELECT 
+        <include refid="Base_Column_List" />
+        FROM sys_user_role
+        <include refid="Data_Of_Where" />
+    </select>
+    
+    <!--根据查询条件查询，返回List-->
+    <select id="findList" parameterType="com.transam.system.entity.UserRole" resultType="com.transam.system.entity.UserRole">
+        SELECT 
+        <include refid="Base_Column_List" />
+        FROM sys_user_role
+        <include refid="Data_Of_Where" />
+    </select>
+    
+    <!--查询全部-->
+    <select id="findAllList" parameterType="com.transam.system.entity.UserRole" resultType="com.transam.system.entity.UserRole">
+        SELECT 
+        <include refid="Base_Column_List" />
+        FROM sys_user_role
+    </select>
+    
+    <!--根据id删除-->
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        DELETE FROM sys_user_role 
+        WHERE user_id = #{userId,jdbcType=BIGINT}
+    </delete>
+    
+    <!--根据条件删除-->
+    <delete id="delete" parameterType="java.lang.Long">
+        DELETE FROM sys_user_role 
+        <include refid="Data_Of_Where" />
+    </delete>
+    
+    <!--插入全部-->
+    <insert id="insert" parameterType="com.transam.system.entity.UserRole">
+        INSERT INTO sys_user_role 
+	<trim prefix="(" suffix=")" suffixOverrides=",">
+        user_id,
+ role_id,
+ 
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+        #{userId,jdbcType=BIGINT},
+ #{roleId,jdbcType=BIGINT},
+ 
+    </trim>
+    </insert>
+
+	<!--插入-->
+    <insert id="insertSelective" parameterType="com.transam.system.entity.UserRole">
+        INSERT INTO sys_user_role
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            userId,
+            roleId,
+
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			#{userId,jdbcType=BIGINT},
+			#{roleId,jdbcType=BIGINT},
+
+        </trim>
+    </insert>
+    
+  	<!--更新-->
+    <update id="update" parameterType="com.transam.system.entity.UserRole">
+        UPDATE sys_user_role
+        <set>
+			<if test="roleId != null">
+				role_id = #{roleId,jdbcType=BIGINT}
+			</if>
+        </set>
+        WHERE user_id = #{userId,jdbcType=BIGINT}
+    </update>
+    
+    <!--批量插入-->
+    <insert id="insertOfBatch" parameterType="java.util.List">
+        INSERT INTO sys_user_role
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+        user_id,
+ role_id,
+ 
+        </trim>
+        <foreach collection="list" item="item" open="values (" close=")" separator=" ), ( ">
+            <trim suffixOverrides=",">
+            #{item.userId,jdbcType=BIGINT}, 
+            #{item.roleId,jdbcType=BIGINT}
+
+            </trim>
+        </foreach>
+    </insert>
+
+	<!--批量更新-->
+    <update id="updateOfBatch" parameterType="java.util.List"> 
+        UPDATE sys_user_role
+        SET 
+
+        WHERE user_id = #{userId,jdbcType=BIGINT}
+        <foreach close=")" collection="idList" index="index" item="item" open="(" separator=",">     
+            #{item}
+        </foreach>
+    </update>
+    
+    <!--批量删除-->
+    <delete id="deleteOfBatch" parameterType="java.lang.String">
+		DELETE FROM sys_user_role WHERE user_id IN 
+		<foreach item="ids" collection="array" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</delete>
+</mapper>

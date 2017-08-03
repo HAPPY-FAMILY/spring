@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="/common/header :: header" />
+<body>
+<div class="l_err" style="width: 100%; margin-top: 2px;"></div>
+<form id="addform" name="addform" class="form-horizontal" method="post"
+	action="/system/resources/edit">
+	
+	<section class="panel panel-default">
+	<input type="hidden" name="id" th:value="${resources.id}">
+	<input type="hidden"  name="parentIds" id="parentIds">
+	
+		<div class="panel-body col-sm-11">
+			<div class="form-group">
+				<label class="col-sm-3 control-label">菜单名</label>
+				<div class="col-sm-9">
+					<input type="text" class="form-control checkacc"
+						placeholder="请输入菜单名称" name="name" id="name" th:value="${resources.name}">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">菜单类型</label>
+				<div class="col-sm-9">
+					<div class="btn-group m-r" id="typeId">
+						<select id="type" name="type" class="form-control m-b"
+							tabindex="-1" onchange="but(this)">
+							<option value="0" th:selected="${resources.type}==0?'selected'">------  模块  ------</option>
+							<option value="1" th:selected="${resources.type}==1?'selected'">------  目录  ------</option>
+							<option value="2" th:selected="${resources.type}==2?'selected'">------  菜单  ------</option>
+							<option value="3" th:selected="${resources.type}==3?'selected'">------  按扭  ------</option>
+						</select>
+					</div>
+				</div>
+			</div>
+			<div class="form-group" id="divbut" style="display: none;">
+				<label class="col-sm-3 control-label">选择</label>
+				<div class="col-sm-9">
+				<div id="but" class="doc-buttons">
+				</div>
+				</div>
+			</div>
+			<div class="form-group" id="divbutshe" style="display: none;">
+				<label class="col-sm-3 control-label">设置按扭</label>
+				<input type="hidden" id="btn" name="btn" />
+				<div class="col-sm-9">
+				<div class="col-sm-12">
+						<label class="col-sm-2 control-label">id=</label><div class="col-sm-4"><input type="text" class="form-control" id="btnId" name="btnId" th:value="${resources.btn} == null?'':${#strings.arraySplit(resources.btn,',')[0]}"></div>
+						<label class="col-sm-2 control-label">name=</label><div class="col-sm-4"><input type="text" class="form-control" id="btnName" name="btnName" th:value="${resources.btn} == null?'':${#strings.arraySplit(resources.btn,',')[3]}"></div>
+					</div>
+				<div class="col-sm-12">
+						<label class="col-sm-2 control-label">class=</label><div class="col-sm-4"><input type="text" class="form-control" id="btnClass" name="btnClass" th:value="${resources.btn} == null?'':${#strings.arraySplit(resources.btn,',')[2]}"></div>
+						<label class="col-sm-2 control-label">value=</label><div class="col-sm-4"><input type="text" class="form-control" id="btnValue" name="btnValue" th:value="${resources.btn} == null?'':${#strings.arraySplit(resources.btn,',')[1]}"></div>
+					</div>
+				</div>
+			</div>
+			<div class="form-group icon">
+				<label class="col-sm-3 control-label">图标</label>
+				<div class="col-sm-9">
+					<input type="text" class="form-control checkacc"
+						placeholder="请输入icon" name="icon" id="icon" th:value="${resources.icon}">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">上级菜单</label>
+				<div class="col-sm-9">
+					<select id="parentId" name="parentId" data-live-search="true" class="form-control m-b"
+						tabindex="-1">
+						
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">菜单url</label>
+				<div class="col-sm-9">
+					<input type="text" class="form-control checkacc"
+						placeholder="请输入菜单url" name="resUrl" id="resUrl" th:value="${resources.resUrl}">
+				</div>
+			</div>
+
+			
+			<div class="form-group">
+				<label class="col-sm-3 control-label">菜单唯一KEY</label>
+				<div class="col-sm-9">
+					<input type="text" class="form-control checkacc"
+						placeholder="请输入菜单标识" name="resKey" id="resKey" th:value="${resources.resKey}">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">叶子菜单</label>
+				<div class="col-sm-9">
+					<input type="checkbox" class="js-switch-isLeaf" th:checked="${resources.isLeaf}==0?false:'checked'"/>
+					<input type="hidden" name="isLeaf" id="isLeaf" th:value="${resources.isLeaf}">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">是否启用</label>
+				<div class="col-sm-9">
+					<input type="checkbox" class="js-switch-status" th:checked="${resources.status}==0?false:'checked'"/>
+					<input type="hidden" name="status" id="status" th:value="${resources.status}">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">菜单描述</label>
+				<div class="col-sm-9">
+					<input type="text" class="form-control checkacc"
+						placeholder="请输入菜单描述" name="remark" id="remark" th:value="${resources.status}">
+				</div>
+			</div>
+		</div>
+	</section>
+</form>
+<script type="text/javascript" th:src="@{/static/js/system/resources/edit.js}"></script>
+<script th:inline="javascript">
+if($('#type').val() == 3){
+	 showBut();
+}
+byRes([[${resources.parentId}]]);
+function byRes(id){
+	var url = '/system/resources/reslists';
+	var data = CommonUtil.ajax(url, "get", null, "json");
+	if (data != null) {
+		var h = "<option value='0'>------顶级目录------</option>";
+		for ( var i = 0; i < data.length; i++) {
+			if(id==data[i].id){
+				h+="<option value='" + data[i].id + "' selected='selected'>"
+								+ data[i].name + "</option>";
+			}else{
+				h+="<option value='" + data[i].id + "'>"+ data[i].name + "</option>";
+			}
+		}
+		$("#parentId").html(h);
+	} else {
+		bootbox.alert("获取菜单信息错误，请联系管理员！");
+	}
+}
+
+</script>
+</body>
+</html>

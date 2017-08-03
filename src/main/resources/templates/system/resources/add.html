@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="/common/header :: header" />
+<body>
+<div class="l_err" style="width: 100%; margin-top: 2px;"></div>
+<form id="addform" name="addform" class="form-horizontal" method="post"
+	action="/system/resources/add">
+	<input type="hidden"  name="parentIds" id="parentIds">
+	<section class="panel panel-default">
+		<div class="panel-body col-sm-11">
+			<div class="form-group">
+				<label class="col-sm-3 control-label">菜单名</label>
+				<div class="col-sm-9">
+					<input type="text" class="form-control checkacc"
+						placeholder="请输入菜单名称" name="name" id="name">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">菜单类型</label>
+				<div class="col-sm-9">
+					<div class="btn-group m-r" id="typeId">
+						<select id="type" name="type" class="form-control m-b"
+							tabindex="-1" onchange="but(this)">
+							<option value="0">------  模块  ------</option>
+							<option value="1">------  目录  ------</option>
+							<option value="2">------  菜单  ------</option>
+							<option value="3">------  按扭  ------</option>
+						</select>
+					</div>
+				</div>
+			</div>
+			<div class="form-group" id="divbut" style="display: none;">
+				<label class="col-sm-3 control-label">选择</label>
+				<div class="col-sm-9">
+				<div id="but" class="doc-buttons">
+				</div>
+				</div>
+			</div>
+			<div class="form-group" id="divbutshe" style="display: none;">
+				<label class="col-sm-3 control-label">设置按扭</label>
+				<input type="hidden" id="btn" name="btn" />
+				<div class="col-sm-9">
+				<div class="col-sm-12">
+						<label class="col-sm-2 control-label">id=</label><div class="col-sm-4"><input type="text" class="form-control" id="btnId" name="btnId"></div>
+						<label class="col-sm-2 control-label">name=</label><div class="col-sm-4"><input type="text" class="form-control" id="btnName" name="btnName"></div>
+					</div>
+				<div class="col-sm-12">
+						<label class="col-sm-2 control-label">class=</label><div class="col-sm-4"><input type="text" class="form-control" id="btnClass" name="btnClass"></div>
+						<label class="col-sm-2 control-label">value=</label><div class="col-sm-4"><input type="text" class="form-control" id="btnValue" name="btnValue"></div>
+					</div>
+				</div>
+			</div>
+			<div class="form-group icon">
+				<label class="col-sm-3 control-label">图标</label>
+				<div class="col-sm-9">
+					<input type="text" class="form-control checkacc"
+						placeholder="请输入icon" name="icon" id="icon">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">上级菜单</label>
+				<div class="col-sm-9">
+					<select id="parentId" name="parentId" data-live-search="true" class="form-control m-b"
+						tabindex="-1">
+						
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">菜单url</label>
+				<div class="col-sm-9">
+					<input type="text" class="form-control checkacc"
+						placeholder="请输入菜单url" name="resUrl" id="resUrl">
+				</div>
+			</div>
+
+			
+			<div class="form-group">
+				<label class="col-sm-3 control-label">菜单唯一KEY</label>
+				<div class="col-sm-9">
+					<input type="text" class="form-control checkacc"
+						placeholder="请输入菜单标识" name="resKey" id="resKey">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">叶子菜单</label>
+				<div class="col-sm-9">
+					<input type="checkbox" class="js-switch-isLeaf"/>
+					<input type="hidden" name="isLeaf" id="isLeaf" value="0">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">是否启用</label>
+				<div class="col-sm-9">
+					<input type="checkbox" class="js-switch-status"/>
+					<input type="hidden" name="status" id="status" value="0">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">菜单描述</label>
+				<div class="col-sm-9">
+					<input type="text" class="form-control checkacc"
+						placeholder="请输入菜单描述" name="remark" id="remark">
+				</div>
+			</div>
+		</div>
+	</section>
+</form>
+<script type="text/javascript" th:src="@{/static/js/system/resources/add.js}"></script>
+</body>
+</html>

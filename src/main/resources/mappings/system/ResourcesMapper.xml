@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.transam.system.mapper.ResourcesMapper">
+    
+    <sql id="Base_Column_List">
+    	id id,
+    	name name,
+    	parent_id parentId,
+    	parent_ids parentIds,
+    	res_key resKey,
+    	type type,
+    	res_url resUrl,
+    	level level,
+    	icon icon,
+    	btn btn,
+    	status status,
+    	remark,
+    	is_leaf isLeaf
+    </sql>
+    
+    <sql id="Data_Of_Where">
+    	<where>
+	    	<if test="id != null and id != ''">
+	    		and id = #{id}
+	    	</if>
+	    	<if test="parentId != null and parentId != '' ">
+	    		and parent_id = #{parentId}
+	    	</if>  	
+	    	<if test="name != null and name != ''">
+	    		and name = #{name}
+	    	</if>
+	    	<if test="resKey != null and resKey != ''">
+	    		and res_key = #{resKey}
+	    	</if>
+    	</where>
+    </sql>
+    
+    <select id="getByPrimaryKey" parameterType="java.lang.Long" resultType="com.transam.system.entity.Resources">
+    	SELECT 
+        <include refid="Base_Column_List" />
+        FROM sys_resources
+        WHERE id = #{id,jdbcType=BIGINT}
+    </select>
+    
+    <!-- 获取菜单 -->
+    <select id="findResource" resultType="com.transam.system.entity.Resources">
+			SELECT
+				id id,
+				`name` `name`,
+				parent_id parentId,
+				(SELECT r. NAME FROM sys_resources r WHERE r.id = sys_resources.parent_id) parentName,
+				res_key resKey,
+				status status,
+				type type,
+				res_url resUrl,
+				`level` level,
+				icon icon,
+				btn btn,
+				is_leaf isLeaf,
+				remark remark
+			FROM sys_resources
+			WHERE id IN (SELECT res_id FROM sys_res_role WHERE 1 = 1 AND role_id = #{roleId})
+			<if test="resources != null and resources.parentId != null">
+				and parent_Id = #{resources.parentId}
+			</if>
+			ORDER BY ID ASC
+    </select>
+    
+    <select id="findList" parameterType="com.transam.system.entity.Resources" resultType="com.transam.system.entity.Resources">
+		SELECT
+			<include refid="Base_Column_List"/>
+		FROM sys_resources
+		<where>
+	    	<if test="id != null and id != ''">
+	    		and id = #{id}
+	    	</if>
+	    	<if test="parentId != null ">
+	    		and parent_id = #{parentId}
+	    	</if>  	
+	    	<if test="name != null and name != ''">
+	    		and name like CONCAT('%',#{name},'%')
+	    	</if>
+	    	<if test="resKey != null and resKey != ''">
+	    		and res_key = #{resKey}
+	    	</if>
+    	</where>
+	</select>
+    
+    <select id="findResByRoleIds" parameterType="java.lang.String" resultType="com.transam.system.entity.Resources">
+   		SELECT
+			id id,
+			`name` `name`,
+			parent_id parentId,
+			(SELECT r. NAME FROM sys_resources r WHERE r.id = sys_resources.parent_id) parentName,
+			res_key resKey,
+			status status,
+			type type,
+			res_url resUrl,
+			`level` level,
+			icon icon,
+			btn btn,
+			is_leaf isLeaf,
+			remark remark
+		FROM sys_resources
+		WHERE status = 1 and id IN (SELECT res_id FROM sys_res_role WHERE 1 = 1 AND role_id IN 
+		<foreach item="roleIds" collection="array" open="(" separator="," close=")">
+			#{roleIds}
+		</foreach>
+		)
+		ORDER BY id ASC
+    </select>
+    
+    <select id="findBtn" resultType="com.transam.system.entity.Resources">
+			SELECT
+				id id,
+				`name` `name`,
+				parent_id parentId,
+				res_key resKey,
+				res_url resUrl,
+				icon icon,
+				btn btn
+			FROM sys_resources
+			WHERE status = 1 AND id IN (SELECT res_id FROM sys_res_role WHERE 1 = 1 AND role_id IN 
+			<foreach item="roleIds" collection="roleId" open="(" separator="," close=")">
+				#{roleIds}
+			</foreach>
+			)
+			<if test="parentId != null and parentId != '' and parent_id != 0">
+				and parent_id = #{parentId}
+			</if>
+			ORDER BY ID ASC
+    </select>
+    
+    
+	<select id="findAllList" resultType="com.transam.system.entity.Resources">
+		SELECT 
+			<include refid="Base_Column_List"/>
+		FROM sys_resources
+			<include refid="Data_Of_Where"/>
+	</select>
+	
+	<select id="findPageList" parameterType="java.lang.String" resultType="com.transam.system.entity.Resources">
+		SELECT
+			<include refid="Base_Column_List"/>
+		FROM cms_content
+			<include refid="Data_Of_Where"/>
+	</select>
+	
+	<select id="getOne" resultType="com.transam.system.entity.Resources">
+		SELECT 
+			* 
+		FROM cms_content
+		WHERE id = #{id}
+	</select>
+	
+	<update id="delete">
+		DELETE cms_conten
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="deleteResRoleByRoleId" parameterType="java.lang.Long">
+		DELETE FROM sys_res_role
+		WHERE role_id = #{roleId}
+	</delete>
+	
+	<delete id="deleteOfBatch" parameterType="java.lang.String">
+		DELETE FROM sys_resources
+		WHERE id in
+		<foreach item="ids" collection="array" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</delete>
+	
+	<insert id="insert" parameterType="com.transam.system.entity.Resources">
+		INSERT INTO sys_resources(
+	    	id ,
+	    	name,
+	    	parent_id,
+	    	parent_ids,
+	    	res_key,
+	    	type,
+	    	res_url,
+	    	level,
+	    	icon,
+	    	btn,
+	    	status,
+	    	is_leaf,
+	    	remark
+		) VALUES (
+			#{id}, 
+			#{name},
+			#{parentId},
+			#{parentIds},
+			#{resKey},
+			#{type},
+			#{resUrl},
+			#{level},
+			#{icon},
+			#{btn},
+			#{status},
+			#{isLeaf},
+			#{remark}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE sys_resources
+		<set>
+			<if test="name != null and name != ''">
+				name = #{name},
+			</if>
+			<if test="parentId != null">
+				parent_id = #{parentId},
+			</if>
+			<if test="parentIds != null and parentIds != ''">
+				parent_ids = #{parentIds},
+			</if>
+			<if test="resKey != null and resKey != ''">
+				res_key = #{resKey},
+			</if>
+			<if test="type != null and type != ''">
+				type = #{type},
+			</if>
+			<if test="resUrl != null and resUrl != ''">
+				res_url = #{resUrl},
+			</if>
+			<if test="level != null">
+				level = #{level},
+			</if>
+			<if test="icon != null and icon != ''">
+				icon = #{icon},
+			</if>
+			<if test="btn != null and btn != ''">
+				btn = #{btn},
+			</if>
+			<if test="status != null">
+				status = #{status,jdbcType=INTEGER},
+			</if>
+			<if test="isLeaf != null">
+				is_leaf = #{isLeaf,jdbcType=INTEGER},
+			</if>
+			<if test="remark != null and remark != ''">
+				remark = #{remark},
+			</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<!--批量插入-->
+    <insert id="addResRoleOfBatch" parameterType="java.util.List">
+        INSERT INTO sys_res_role
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+        res_id,
+ 		role_id
+        </trim>
+        <foreach collection="list" item="item" open="values (" close=")" separator=" ), ( ">
+            <trim suffixOverrides=",">
+            #{item.resId}, 
+            #{item.roleId}
+            </trim>
+        </foreach>
+    </insert>
+</mapper>

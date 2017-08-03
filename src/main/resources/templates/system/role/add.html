@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="/common/header :: header" />
+<body>
+<div class="l_err" style="width: 100%; margin-top: 2px;"></div>
+<form id="addform" name="addform" class="form-horizontal" method="post"
+	th:action="@{/system/role/add}">
+		<section class="panel panel-default">
+		<input name="resId" id="resId" type="hidden">
+		<input name="txtUserSelect" id="txtUserSelect" type="hidden">
+		<div class="panel-body col-sm-8">
+			<div class="form-group">
+				<label class="col-sm-3 control-label">角色名</label>
+				<div class="col-sm-9">
+					<input type="text" class="form-control checkacc"
+						placeholder="请输入角色名" name="name" id="name">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">roleKey</label>
+				<div class="col-sm-9">
+					<input type="text" class="form-control checkacc"
+						placeholder="请输入roleKey" name="roleKey" id="roleKey">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">用户组</label>	
+				<div class="col-sm-9">
+					<select id='user-selected' multiple='multiple'>
+					  <option th:value='${user.id}' th:each="user:${users}" th:text="${user.accountName}"></option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">分配权限</label>
+				<div class="col-sm-9">
+					<ul id="pztree" class="ztree pztree col-sm-12"></ul>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">是否启用</label>
+				<div class="col-sm-9">
+					<input type="checkbox" class="js-switch"/>
+					<input type="hidden" name="status" id="status" value="0">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">描述</label>
+				<div class="col-sm-9">
+					<input type="text" class="form-control" placeholder="请输入描述"
+						name="description" id="description">
+				</div>
+			</div>
+		</div>
+	</section>
+</form>
+<script type="text/javascript" th:src="@{/static/js/system/role/add.js}"></script>
+<script th:inline="javascript">
+var setting = {
+		check: {
+			enable: true
+		},
+		data : {
+			simpleData : {
+				enable : true,
+				idKey: "id",
+				pIdKey: "parentId"
+			}
+		},
+		callback: {
+			onCheck: onCheck,
+		}
+	};
+	function onCheck(e, treeId, treeNode){
+		var sNodes = zTree.getCheckedNodes(true);
+		var resId = "";
+		for(var i=0;i<sNodes.length;i++){
+			resId += sNodes[i].id+",";
+		};
+		$("#resId").val(resId);
+	}
+	var zNodes = JSON.parse([[${permissions}]]);
+	var zTree;
+	$(document).ready(function() {
+		zTree = $.fn.zTree.init($("#pztree"), setting, zNodes);
+		//zTree.expandAll(true);
+		zTree.setting.check.chkboxType = { "Y" : "ps", "N" : "s" };
+		
+		$(zNodes).each(function(index,item){
+			if(item.status == 0){
+		    	zTree.hideNode(zTree.getNodeByParam( 'id',item.id ));
+		    }
+		});
+		
+	});
+
+</script>
+</body>
+
+</html>

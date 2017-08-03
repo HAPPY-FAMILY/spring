@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>系统登录</title>
+<link rel="stylesheet" type="text/css" th:href="@{/static/css/login.css}" />
+<script>if(window.top !== window.self){ window.top.location = window.location;}</script>
+</head>
+<body>
+<div class="container">
+	<section id="content">
+		<form th:action="@{/login}" method="post">
+			<h1>会员登录</h1>
+			<div>
+				<input type="text" placeholder="账号" value="admin" name="username" id="username" />
+			</div>
+			<div>
+				<input type="password" placeholder="密码" value="123456" name="password" id="password" />
+			</div>
+			<div class="">
+				<span class="help-block u-errormessage" id="js-server-helpinfo">&nbsp;</span>			
+			</div> 
+			<div>
+				<!-- <input type="submit" value="Log in" /> -->
+				<input type="submit" value="登录" class="btn btn-primary" id="js-btn-login"/>
+				<a href="#">忘记密码?</a>
+			</div>
+		</form><!-- form -->
+	</section><!-- content -->
+</div>
+<script th:src="@{https://cdn.bootcss.com/jquery/2.2.4/jquery.min.js}"></script>
+<script type="text/javascript" th:src="@{/static/assets/layer/layer.js}"></script>
+<script th:inline="javascript">
+	if([[${error}]] != null && [[${error}]] != '' && [[${error}]] != undefined){
+		layer.alert([[${error}]]);
+	}
+</script>
+
+</body>
+</html>
